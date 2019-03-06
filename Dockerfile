@@ -4,7 +4,8 @@ FROM centos:7
 RUN /usr/bin/yum -y update
 
 # Install glibc dependancy on the system.
-RUN /usr/bin/yum -y install glibc libstdc++ glibc.i686 libstdc++.i686 wget
+RUN /usr/bin/yum -y install \
+    glibc libstdc++ glibc.i686 libstdc++.i686 ncurses-libs ncurses-libs.i686 wget
 
 # Download the Steam application from from Steam's website.
 RUN /usr/bin/wget -c -O /tmp/steamcmd_linux.tar.gz \
@@ -25,5 +26,11 @@ RUN /usr/sbin/adduser --home-dir=/home/steam --create-home steam && \
 USER steam
 WORKDIR /home/steam
 
+# Run a Steam update.
+RUN /steam/steamcmd.sh +quiet
+
 # Set user selectable environment variables.
 ENV STEAM_LOGIN="anonymous"
+
+# Setup the LD_LIBRARY_PATH path properly for the srcds_linux command.
+ENV LD_LIBRARY_PATH=".:bin:${LD_LIBRARY_PATH}"
